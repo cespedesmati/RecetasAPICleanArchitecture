@@ -35,7 +35,25 @@ public class RecipeService : IRecipeService
         {
             response.IsSuccess = true;
             response.Data = mapper.Map<IList<RecipeResponseDto>>(recipes);
-            response.Message = ReplyMessage.MESSAGE_SAVE;
+            response.Message = ReplyMessage.MESSAGE_QUERY;
+        }
+        else
+        {
+            response.IsSuccess = false;
+            response.Message = ReplyMessage.MESSAGE_FAILED;
+        }
+        return response;
+    }
+
+    public async Task<BaseResponse<RecipeResponseDto>> GetById(Guid id)
+    {
+        var response = new BaseResponse<RecipeResponseDto>();
+        var recipe = await unitOfWork.RecipeRepository.GetById(id);
+        if (recipe is not null)
+        {
+            response.IsSuccess = true;
+            response.Data = mapper.Map<RecipeResponseDto>(recipe);
+            response.Message = ReplyMessage.MESSAGE_QUERY;
         }
         else
         {

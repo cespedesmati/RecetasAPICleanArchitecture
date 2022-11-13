@@ -12,14 +12,10 @@ namespace WebApi.Controllers;
 [ApiController]
 public class RecipeController : Controller
 {
-    private readonly IUnitOfWork unitOfWork;
-    private readonly IMapper mapper;
     private readonly IRecipeService recipeService;
 
-    public RecipeController(IUnitOfWork unitOfWork, IMapper mapper, IRecipeService recipeService)
+    public RecipeController(IMapper mapper, IRecipeService recipeService)
     {
-        this.unitOfWork = unitOfWork;
-        this.mapper = mapper;
         this.recipeService = recipeService;
     }
 
@@ -31,9 +27,9 @@ public class RecipeController : Controller
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Recipe>> Get(Guid id)
+    public async Task<ActionResult<Recipe>> GetById(Guid id)
     {
-        var response = await unitOfWork.RecipeRepository.GetById(id);
+        var response = await recipeService.GetById(id);
         return Ok(response);
     }
 

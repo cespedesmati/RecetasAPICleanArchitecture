@@ -2,6 +2,7 @@
 using Application.DTOs.IngredientUsed;
 using Application.DTOs.Recipe;
 using Application.DTOs.Step;
+using Application.DTOs.User;
 using AutoMapper;
 using Domain;
 
@@ -16,6 +17,8 @@ public class MapperProfile : Profile
         CreateMap<Category, CategoryRequestDto>().ReverseMap();
         CreateMap<IngredientUsed, IngredientUsedRequestDto>().ReverseMap();
         CreateMap<Step, StepRequestDto>().ReverseMap();
+        CreateMap<User, UserRequestDto>().ReverseMap();
+        CreateMap<User, UserResponseDto>().ReverseMap();
 
     }
 }
