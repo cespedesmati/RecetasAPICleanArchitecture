@@ -7,7 +7,7 @@ namespace Domain
     public class Review : AuditableBase
     {
         [Key]
-        public Guid idReview { get; set; }
+        public Guid idReview { get; set; } = Guid.NewGuid();
         public string title { get; set; }
         public string description { get; set; }
         public int score { get; set; }

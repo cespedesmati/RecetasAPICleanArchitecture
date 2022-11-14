@@ -13,6 +13,7 @@ public class RecipeResponseDto
 {
     public Guid IdRecipe { get; set; }
     public string nameRecipe { get; set; }
+    public int score { get; set; }
     public Guid? idUser { get; set; }
     public IList<IngredientUsedRequestDto>? ingredients { get; set; }
     public IList<StepRequestDto>? Steps { get; set; }

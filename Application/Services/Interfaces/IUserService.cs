@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Recipe;
+using Application.DTOs.Review;
 using Application.DTOs.User;
 using Application.Helpers;
 using System;
@@ -19,5 +20,8 @@ namespace Application.Services.Interfaces
         Task<BaseResponse<bool>> AddBookmark(Guid idUser, Guid idRecipe);
         Task<BaseResponse<bool>> DeleteBookmark(Guid idUser, Guid idRecipe);
         Task<BaseResponse<IEnumerable<RecipeResponseDto>>> GetBookmarksByUser(Guid idUser);
+        Task<BaseResponse<Guid>> AddReview(ReviewRequestDto reviewDto, Guid idUser, Guid idRecipe);
+        Task<BaseResponse<bool>> DeleteReview(Guid idReview);
+        Task<BaseResponse<IEnumerable<ReviewResponseDto>>> GetReviewsByUser(Guid idUser);
     }
 }

@@ -12,6 +12,6 @@ public class User : AuditableBase
     public string? firstName { get; set; }
     public string? lastName { get; set; }
     public IList<Recipe>? recipes { get; set; }
-    public IList<Review>? reviews { get; set; }
+    public IList<Review>? reviews { get; set; } = new List<Review>();
     public IList<Bookmark>? bookmarks { get; set; } = new List<Bookmark>();
 }

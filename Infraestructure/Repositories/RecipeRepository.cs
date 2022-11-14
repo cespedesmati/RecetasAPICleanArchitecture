@@ -111,4 +111,17 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
 
         return entity;
     }
+
+    public async Task<Recipe> GetAllReviews(Guid idRecipe)
+    {
+        var entity = await dataContext.Recipes
+            .Where(x => x.idRecipe == idRecipe)
+                .Include(x => x.reviews)
+            .FirstOrDefaultAsync();
+
+        if (entity == null)
+            throw new KeyNotFoundException();
+
+        return entity;
+    }
 }

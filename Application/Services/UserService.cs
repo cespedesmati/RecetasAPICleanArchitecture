@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Recipe;
+using Application.DTOs.Review;
 using Application.DTOs.User;
 using Application.Helpers;
 using Application.Services.Interfaces;
@@ -158,7 +159,7 @@ namespace Application.Services
             }
 
             user.bookmarks = user.bookmarks!.Where(x => x.idRecipe != idRecipe).ToList(); 
-            //user.bookmarks.Remove(exists!);
+            //user.bookmarks.Remove(review!);
             int result = await unitOfWork.SaveChangesAsync();
 
             if (result > 0)
@@ -195,5 +196,83 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<BaseResponse<Guid>> AddReview(ReviewRequestDto reviewDto, Guid idUser, Guid idRecipe)
+        {
+            var response = new BaseResponse<Guid>();
+            
+            await unitOfWork.UserRepository.GetById(idUser);
+            var recipe = await unitOfWork.RecipeRepository.GetAllReviews(idRecipe);
+
+            var newReview = mapper.Map<Review>(reviewDto);
+            newReview.idUser = idUser;
+            newReview.idRecipe = idRecipe;
+            await unitOfWork.ReviewRepository.Insert(newReview);
+
+            var puntaje = newReview.score;
+            recipe.score = (recipe.score + newReview.score) / recipe.reviews.Count();
+
+            int result = await unitOfWork.SaveChangesAsync();
+            if (result > 0)
+            {
+                response.IsSuccess = true;
+                response.Data = newReview.idReview;
+                response.Message = ReplyMessage.MESSAGE_SAVE;
+            }
+            else
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_FAILED;
+            }
+            return response;
+        }
+
+        public async Task<BaseResponse<bool>> DeleteReview(Guid idReview)
+        {
+            var response = new BaseResponse<bool>();
+            var review = await unitOfWork.ReviewRepository.GetById(idReview);
+            if (review is null)
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_QUERY_EMPTY;
+            }
+
+            await unitOfWork.ReviewRepository.Delete(review);
+
+            int result = await unitOfWork.SaveChangesAsync();
+            if (result > 0)
+            {
+                response.IsSuccess = true;
+                response.Data = true;
+                response.Message = ReplyMessage.MESSAGE_SAVE;
+            }
+            else
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_FAILED;
+            }
+            return response;
+        }
+
+        public async Task<BaseResponse<IEnumerable<ReviewResponseDto>>> GetReviewsByUser(Guid idUser)
+        {
+            var response = new BaseResponse<IEnumerable<ReviewResponseDto>>();
+
+            var reviews = (await unitOfWork.UserRepository.GetAllReviews(idUser)).reviews;
+
+            if (reviews is null)
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_QUERY_EMPTY;
+            }
+            else
+            {
+                response.IsSuccess = true;
+                response.Data = mapper.Map<IEnumerable<ReviewResponseDto>>(reviews);
+                response.Message = ReplyMessage.MESSAGE_QUERY;
+            }
+            return response;
+        }
+
     }
 }

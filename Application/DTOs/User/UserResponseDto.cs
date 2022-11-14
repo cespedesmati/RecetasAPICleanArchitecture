@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Recipe;
+using Application.DTOs.Review;
 using Domain;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Application.DTOs.User
         public string? firstName { get; set; }
         public string? lastName { get; set; }
         public IList<RecipeResponseDto>? recipes { get; set; }
-        public IList<Review>? reviews { get; set; }
+        public IList<ReviewResponseDto>? reviews { get; set; }
         public IList<Bookmark>? bookmarks { get; set; }
     }
 }

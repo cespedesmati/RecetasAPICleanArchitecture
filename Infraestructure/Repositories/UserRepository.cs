@@ -26,6 +26,19 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return entity;
     }
 
+    public async Task<User> GetAllReviews(Guid idUser)
+    {
+        var entity = await dataContext.User
+            .Where(x => x.idUser == idUser)
+                .Include(x1 => x1.reviews)!
+            .FirstOrDefaultAsync();
+
+        if (entity == null)
+            throw new KeyNotFoundException();
+
+        return entity;
+    }
+
     public async Task<User> GetByMail(string email)
     {
         var entity = await dataContext.User

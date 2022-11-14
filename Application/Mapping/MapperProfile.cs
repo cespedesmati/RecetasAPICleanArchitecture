@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Category;
 using Application.DTOs.IngredientUsed;
 using Application.DTOs.Recipe;
+using Application.DTOs.Review;
 using Application.DTOs.Step;
 using Application.DTOs.User;
 using AutoMapper;
@@ -19,6 +20,8 @@ public class MapperProfile : Profile
         CreateMap<Step, StepRequestDto>().ReverseMap();
         CreateMap<User, UserRequestDto>().ReverseMap();
         CreateMap<User, UserResponseDto>().ReverseMap();
+        CreateMap<Review, ReviewRequestDto>().ReverseMap();
+        CreateMap<Review, ReviewResponseDto>().ReverseMap();
 
     }
 }

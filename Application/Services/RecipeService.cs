@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs.User;
+using Application.DTOs.Review;
 
 namespace Application.Services;
 
@@ -159,6 +160,28 @@ public class RecipeService : IRecipeService
         return response;
     }
 
+    public async Task<BaseResponse<IEnumerable<ReviewResponseDto>>> GetReviewsByRecipe(Guid idRecipe)
+    {
+
+        var response = new BaseResponse<IEnumerable<ReviewResponseDto>>();
+
+        var reviews = (await unitOfWork.RecipeRepository.GetAllReviews(idRecipe)).reviews;
+
+        if (reviews is null)
+        {
+            response.IsSuccess = false;
+            response.Message = ReplyMessage.MESSAGE_QUERY_EMPTY;
+        }
+        else
+        {
+            response.IsSuccess = true;
+            response.Data = mapper.Map<IEnumerable<ReviewResponseDto>>(reviews);
+            response.Message = ReplyMessage.MESSAGE_QUERY;
+        }
+        return response;
+    }
+
+
 
     private static void AddSteps(IList<StepRequestDto> stepsDTO, Recipe recipe)
     {
@@ -222,4 +245,5 @@ public class RecipeService : IRecipeService
     }
 
 
+    
 }
