@@ -97,4 +97,18 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
         return consulta;
 
     }
+
+    public async Task<Recipe> GetAllUsers(Guid idRecipe)
+    {
+        var entity = await dataContext.Recipes
+            .Where(x => x.idRecipe == idRecipe)
+                .Include(x => x.bookmarks)!
+                    .ThenInclude(y1 => y1.user)
+            .FirstOrDefaultAsync();
+
+        if (entity == null)
+            throw new KeyNotFoundException();
+
+        return entity;
+    }
 }

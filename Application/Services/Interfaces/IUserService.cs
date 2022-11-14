@@ -1,4 +1,5 @@
-﻿using Application.DTOs.User;
+﻿using Application.DTOs.Recipe;
+using Application.DTOs.User;
 using Application.Helpers;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,8 @@ namespace Application.Services.Interfaces
         Task<BaseResponse<Guid>> CreateUser(UserRequestDto requestDTO);
         Task UpdateUser(UserUpdateRequestDto userDto, Guid id);
         Task<BaseResponse<bool>> DeleteUser(Guid id);
+        Task<BaseResponse<bool>> AddBookmark(Guid idUser, Guid idRecipe);
+        Task<BaseResponse<bool>> DeleteBookmark(Guid idUser, Guid idRecipe);
+        Task<BaseResponse<IEnumerable<RecipeResponseDto>>> GetBookmarksByUser(Guid idUser);
     }
 }

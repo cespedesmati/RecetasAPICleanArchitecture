@@ -1,4 +1,5 @@
-﻿using Application.DTOs.User;
+﻿using Application.DTOs.Recipe;
+using Application.DTOs.User;
 using Application.Helpers;
 using Application.Services.Interfaces;
 using AutoMapper;
@@ -112,6 +113,87 @@ namespace Application.Services
             user.lastName = userDto.lastName ?? user.lastName;
             user.email = userDto.email ?? user.email;
             await unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<BaseResponse<bool>> AddBookmark(Guid idUser, Guid idRecipe)
+        {
+            var response = new BaseResponse<bool>();
+            var user = await unitOfWork.UserRepository.GetById(idUser);
+            var recipe = await unitOfWork.RecipeRepository.GetById(idRecipe);
+            var exists = user.bookmarks!.Where(x => x.idRecipe == idRecipe).FirstOrDefault();
+            if (exists is not null)
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_EXISTS;
+            }
+            user.bookmarks = user.bookmarks!.Concat(new[] { new Bookmark { recipe = recipe, user = user } }).ToArray();
+            //user.bookmarks!.Add(new Bookmark { recipe = recipe, user = user });
+
+            int result = await unitOfWork.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                response.IsSuccess = true;
+                response.Data = true;
+                response.Message = ReplyMessage.MESSAGE_SAVE;
+            }
+            else
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_FAILED;
+            }
+            return response;
+        }
+
+        public async Task<BaseResponse<bool>> DeleteBookmark(Guid idUser, Guid idRecipe)
+        {
+            var response = new BaseResponse<bool>();
+            var recipe = await unitOfWork.RecipeRepository.GetById(idRecipe);
+            var user = await unitOfWork.UserRepository.GetAllBookmarks(idUser);
+            var exists = user.bookmarks!.Where(x => x.idRecipe == idRecipe).FirstOrDefault();
+            if (exists is null)
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_QUERY_EMPTY;
+            }
+
+            user.bookmarks = user.bookmarks!.Where(x => x.idRecipe != idRecipe).ToList(); 
+            //user.bookmarks.Remove(exists!);
+            int result = await unitOfWork.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                response.IsSuccess = true;
+                response.Data = true;
+                response.Message = ReplyMessage.MESSAGE_SAVE;
+            }
+            else
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_FAILED;
+            }
+            return response;
+        }
+
+        public async Task<BaseResponse<IEnumerable<RecipeResponseDto>>> GetBookmarksByUser(Guid idUser)
+        {
+            var response = new BaseResponse<IEnumerable<RecipeResponseDto>>();
+
+            var recipes = (await unitOfWork.UserRepository.GetAllBookmarks(idUser))
+                .bookmarks!.Select(x => x.recipe);
+
+            if (recipes is null || !recipes.Any())
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_QUERY_EMPTY;
+            }
+            else
+            {
+                response.IsSuccess = true;
+                response.Data = recipes.Select(x => new RecipeResponseDto { IdRecipe = x.idRecipe, nameRecipe = x.nameRecipe }).ToList();
+                response.Message = ReplyMessage.MESSAGE_QUERY;
+            }
+            return response;
         }
     }
 }

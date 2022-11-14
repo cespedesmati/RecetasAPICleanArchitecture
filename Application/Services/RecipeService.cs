@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.DTOs.User;
 
 namespace Application.Services;
 
@@ -135,6 +136,29 @@ public class RecipeService : IRecipeService
         }
         return response;
     }
+
+
+    public async Task<BaseResponse<IEnumerable<UserResponseDto>>> GetBookmarksByRecipe(Guid idRecipe)
+    {
+        var response = new BaseResponse<IEnumerable<UserResponseDto>>();
+
+        var users = (await unitOfWork.RecipeRepository.GetAllUsers(idRecipe))
+            .bookmarks!.Select(x => x.user);
+
+        if (users is null || !users.Any())
+        {
+            response.IsSuccess = false;
+            response.Message = ReplyMessage.MESSAGE_QUERY_EMPTY;
+        }
+        else
+        {
+            response.IsSuccess = true;
+            response.Data = users.Select(x => new UserResponseDto { idUser = x.idUser, email = x.email }).ToList();
+            response.Message = ReplyMessage.MESSAGE_QUERY;
+        }
+        return response;
+    }
+
 
     private static void AddSteps(IList<StepRequestDto> stepsDTO, Recipe recipe)
     {

@@ -9,7 +9,7 @@ public class Recipe : AuditableBase
     [Key]
     public Guid idRecipe { get; set; } = Guid.NewGuid();
     public string nameRecipe { get; set; }
-    public int score { get; set; }
+    public int score { get; set; } = 0;
     public Guid idUser { get; set; }
 
     [ForeignKey("idUser")]

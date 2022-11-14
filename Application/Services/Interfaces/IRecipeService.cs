@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Recipe;
+using Application.DTOs.User;
 using Application.Helpers;
 
 namespace Application.Services.Interfaces
@@ -10,7 +11,6 @@ namespace Application.Services.Interfaces
         Task<BaseResponse<Guid>> Create(RecipeRequestDto requestDTO);
         Task<BaseResponse<bool>> Delete(Guid id);
         Task Update(RecipeUpdateRequestDto recipeDTO, Guid id);
-
-        
+        Task<BaseResponse<IEnumerable<UserResponseDto>>> GetBookmarksByRecipe(Guid idRecipe);
     }
 }
