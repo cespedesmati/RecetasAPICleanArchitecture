@@ -29,14 +29,19 @@ public class RecipeService : IRecipeService
     }
 
 
-    public async Task<BaseResponse<IList<RecipeResponseDto>>> GetAll(string? sortField, string? sortDirection)
+    public async Task<BasePaginatedResponse<IList<RecipeResponseDto>>> GetAll(string? sortField, string? sortDirection, int page , int pageSize)
     {
-        var response = new BaseResponse<IList<RecipeResponseDto>>();
-        var recipes = await unitOfWork.RecipeRepository.GetAllRecipes(sortField,sortDirection);
+        var response = new BasePaginatedResponse<IList<RecipeResponseDto>>();
+        var recipes = await unitOfWork.RecipeRepository.GetAllRecipes(sortField,sortDirection,page,pageSize);
+        var totalRecipes = await unitOfWork.RecipeRepository.CountRecipes();
         if (recipes is not null)
         {
             response.IsSuccess = true;
             response.Data = mapper.Map<IList<RecipeResponseDto>>(recipes);
+            response.Page = page;
+            response.PageSize = pageSize;
+            response.TotalItems = totalRecipes;
+            response.TotalPages = (int)Math.Ceiling((double)totalRecipes / pageSize);
             response.Message = ReplyMessage.MESSAGE_QUERY;
         }
         else
@@ -244,6 +249,4 @@ public class RecipeService : IRecipeService
         }
     }
 
-
-    
 }

@@ -21,7 +21,7 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
         this.recipeSortFactory = recipeSortFactory;
     }
 
-    public async Task<IList<Recipe>> GetAllRecipes(string? sortField, string? sortDirection)
+    public async Task<IList<Recipe>> GetAllRecipes(string? sortField, string? sortDirection, int page, int pageSize)
     {
         var recipes = dataContext.Recipes.AsQueryable();
 
@@ -40,7 +40,10 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
             recipes = sortStrategy.Sort(recipes);
         }
 
-        return await recipes.ToListAsync();
+        return await recipes
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<object> GetAll2()
@@ -125,6 +128,11 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
                 .ThenInclude(iu => iu.ingredient)
             .Include(s => s.Steps)
             .Include(c => c.categories).ToListAsync();
+    }
+
+    public async Task<int> CountRecipes()
+    {
+        return await dataContext.Recipes.CountAsync();
     }
 }
 
