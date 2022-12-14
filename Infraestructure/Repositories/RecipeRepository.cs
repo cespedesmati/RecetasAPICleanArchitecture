@@ -7,64 +7,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Helpers.Sort;
 
 namespace Infraestructure.Repositories;
 
 public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
 {
     private readonly DataContext dataContext;
-    public RecipeRepository(DataContext dataContext) : base(dataContext)
+    private readonly IRecipeSortFactory recipeSortFactory; 
+    public RecipeRepository(DataContext dataContext, IRecipeSortFactory recipeSortFactory) : base(dataContext)
     {
-        this.dataContext = dataContext; 
+        this.dataContext = dataContext;
+        this.recipeSortFactory = recipeSortFactory;
     }
 
-
-    public async Task<IList<Recipe>> GetAllRecipes()
+    public async Task<IList<Recipe>> GetAllRecipes(string? sortField, string? sortDirection)
     {
-       /* var consulta = await dataContext.Recipes
-            .Select(r => new Recipe
-            {
-                idRecipe = r.idRecipe,
-                nameRecipe = r.nameRecipe,
-                score = r.score,
-                idUser = r.idUser,
-                categories = r.categories.Select(c => new Category
-                {
-                    idCategory = c.idCategory,
-                    name = c.name
-                }).FirstOrDefault(),
-                ingredients = r.ingredients.Select(i => new IngredientUsed
-                {
-                    idIngredientUsed = i.idIngredientUsed,
-                    amount = i.amount,
-                    unit = i.unit,
-                    ingredient = i.ingredient,
-                    comment = i.comment
-                }).ToList()
-            } ).ToList();*/
+        var recipes = dataContext.Recipes.AsQueryable();
 
-        return await dataContext.Recipes
+        recipes = recipes
             .Include(u => u.user)
             .Include(iu => iu.ingredients)!
                 .ThenInclude(u => u.unit)
             .Include(iu => iu.ingredients)!
                 .ThenInclude(iu => iu.ingredient)
             .Include(s => s.Steps)
-            .Include(c => c.categories)
-            .ToListAsync();
+            .Include(c => c.categories);
+
+        var sortStrategy = recipeSortFactory.CreateSortStrategy(sortField, sortDirection);
+        if (sortStrategy != null)
+        {
+            recipes = sortStrategy.Sort(recipes);
+        }
+
+        return await recipes.ToListAsync();
     }
 
     public async Task<object> GetAll2()
     {
         var consulta = await dataContext.Recipes
-            .Select(r => new 
+            .Select(r => new
             {
                 r.idRecipe,
                 r.nameRecipe,
                 r.score,
                 r.idUser,
                 categories = r.categories!
-                .Select(c => new {
+                .Select(c => new
+                {
                     c.idCategory,
                     c.name
                 }).ToList(),
@@ -83,7 +73,7 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
                         i.ingredient.idIngredient,
                         i.ingredient.name,
                     },
-                    
+
                     i.comment
                 }).ToList(),
                 steps = r.Steps!.Select(s => new
@@ -124,4 +114,17 @@ public class RecipeRepository : GenericRepository<Recipe>, IRecipeRepository
 
         return entity;
     }
+
+    public async Task<IList<Recipe>> GetAllRecipes()
+    {
+        return await dataContext.Recipes
+            .Include(u => u.user)
+            .Include(iu => iu.ingredients)!
+                .ThenInclude(u => u.unit)
+            .Include(iu => iu.ingredients)!
+                .ThenInclude(iu => iu.ingredient)
+            .Include(s => s.Steps)
+            .Include(c => c.categories).ToListAsync();
+    }
 }
+

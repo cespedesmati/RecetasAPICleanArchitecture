@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Application.Helpers.Sort;
+using Domain.Interfaces;
 using Domain.SeedWork;
 using Infraestructure.Data;
 using Infraestructure.Repositories;
@@ -25,6 +26,7 @@ namespace Infraestructure.Extensions
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IIngredientRepository, IngredientRepository>();
             services.AddScoped<IIngredientUsedRepository, IngredientUsedRepository>();
+            services.AddScoped<IRecipeSortFactory, RecipeSortFactory>();
             services.AddScoped<IRecipeRepository, RecipeRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IStepRepository, StepRepository>();

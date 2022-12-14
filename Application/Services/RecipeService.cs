@@ -29,10 +29,10 @@ public class RecipeService : IRecipeService
     }
 
 
-    public async Task<BaseResponse<IList<RecipeResponseDto>>> GetAll()
+    public async Task<BaseResponse<IList<RecipeResponseDto>>> GetAll(string? sortField, string? sortDirection)
     {
         var response = new BaseResponse<IList<RecipeResponseDto>>();
-        var recipes = await unitOfWork.RecipeRepository.GetAllRecipes();
+        var recipes = await unitOfWork.RecipeRepository.GetAllRecipes(sortField,sortDirection);
         if (recipes is not null)
         {
             response.IsSuccess = true;

@@ -20,9 +20,9 @@ public class RecipeController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult<BaseResponse<IList<RecipeResponseDto>>>> Get()
+    public async Task<ActionResult<BaseResponse<IList<RecipeResponseDto>>>> Get([FromQuery] string? sortField, [FromQuery] string? sortDirection)
     {
-        var response = await recipeService.GetAll();
+        var response = await recipeService.GetAll(sortField,sortDirection);
         return Ok(response);
     }
 
